@@ -4,6 +4,8 @@ package com.example.demo.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -30,6 +32,7 @@ public class FraudLabel {
 
     private String name;
     private String description;
+    @JsonManagedReference
     @OneToMany(mappedBy = "fraudLabel", fetch = FetchType.LAZY)
     private List<FraudTemplate> fraudTemplates;
 

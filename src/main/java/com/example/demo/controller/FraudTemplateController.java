@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.demo.dto.FraudTemplateDTO;
+
 import com.example.demo.model.FraudLabel;
 import com.example.demo.model.FraudTemplate;
 import com.example.demo.service.FileStorageService;
@@ -49,77 +49,80 @@ public class FraudTemplateController {
     @Autowired
     FileStorageService fileStorageService;
     @GetMapping()
-    public ResponseEntity<List<FraudTemplateDTO>> getAllFraudTemplates() {
+    public ResponseEntity<List<FraudTemplate>> getAllFraudTemplates() {
         return new ResponseEntity<>(fraudTemplateService.getAllFraudTemplatesDTO(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FraudTemplateDTO> getFraudTemplate(
-        @PathVariable Integer id // Thêm annotation này
+    public ResponseEntity<FraudTemplate> getFraudTemplate(
+        @PathVariable Integer id 
     ) {
         return ResponseEntity.ok(fraudTemplateService.getFraudTemplateDTOById(id));
     }
 
     @PostMapping()
-    public ResponseEntity<List<FraudTemplate>> createTemplate(
+    public ResponseEntity<String> createTemplate(
         @RequestParam("fraudLabelId") int fraudLabelId,
         @RequestParam("file") MultipartFile[] files
-    ) {
-       List<FraudTemplate> saveTemplates = new ArrayList<>();
+    ) throws IOException {
+
+        List<String> listSaveFileName = fileStorageService.saveImage(files);
+
+
+       
        FraudLabel fraudLabel = fraudLabelService.getFraudLabelById(fraudLabelId);
-       for(MultipartFile file : files)
-       {
-        try{
+       try {
+        
+                for(String fileName : listSaveFileName)
+                {
+                    FraudTemplate fraudTemplate = new FraudTemplate();
+                    fraudTemplate.setFraudLabel(fraudLabel);
+                    fraudTemplate.setImageUrl(fileName);
+                    String[] firstSplit = fileName.split("\\."); 
+                    String[] secondSplit = firstSplit[0].split("/"); 
+                    String lastPart = secondSplit[secondSplit.length - 1]; 
+                    fraudTemplate.setName(lastPart);
 
-            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            String[] listSaveFileName = fileStorageService.saveImage(file, fileName).split("\\s+");
-
-            
-
-            FraudTemplate fraudTemplate = new FraudTemplate();
-            fraudTemplate.setName(file.getOriginalFilename());
-            fraudTemplate.setImageUrl(fileName);
-            fraudTemplate.setFraudLabel(fraudLabel);
-            fraudTemplate.setWidth(Integer.parseInt(listSaveFileName[1]));
-            fraudTemplate.setHeight(Integer.parseInt(listSaveFileName[2]));
-            
-            saveTemplates.add(fraudTemplateService.addFraudTemplate(fraudTemplate));
-
-
-        }
-        catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+                   fraudTemplateService.addFraudTemplate(fraudTemplate);
+                }
+       } catch (Exception e) {
+        // TODO: handle exception
+          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Đã xảy ra lỗi trong quá trình thêm template: " + e.getMessage());
        }
-       return new ResponseEntity<>(saveTemplates, HttpStatus.CREATED);
+      
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Thêm template thành công");
+       
+       
     }
 
 
 
-    @PutMapping("/{id}")
-    public ResponseEntity<FraudTemplate> updateFraudTemplate(
-        @PathVariable int id, 
-        @ModelAttribute FraudTemplate fraudTemplate,
-        @RequestParam(value = "image", required = false ) MultipartFile image
-         ) throws IOException {
+    // @PutMapping("/{id}")
+    // public ResponseEntity<FraudTemplate> updateFraudTemplate(
+    //     @PathVariable int id, 
+    //     @ModelAttribute FraudTemplate fraudTemplate,
+    //     @RequestParam(value = "image", required = false ) MultipartFile image
+    //      ) throws IOException {
 
 
-        FraudTemplate existingTemplate = fraudTemplateService.getFraudTemplateById(id);
-        if(existingTemplate == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-       // System.out.println(existingTemplate.getFraudLabel());
+    //     FraudTemplate existingTemplate = fraudTemplateService.getFraudTemplateById(id);
+    //     if(existingTemplate == null) {
+    //         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    //     }
+    //    // System.out.println(existingTemplate.getFraudLabel());
         
-       if (image != null && !image.isEmpty()) {
-        String fileName = image.getOriginalFilename();
-        String imagePath = fileStorageService.saveImage(image, fileName);  
-        existingTemplate.setImageUrl(imagePath);
-        existingTemplate.setName(fileName.split("\\.")[0]);
-    }
+    //    if (image != null && !image.isEmpty()) {
+    //     String fileName = image.getOriginalFilename();
+    //     String imagePath = fileStorageService.saveImage(image, fileName);  
+    //     existingTemplate.setImageUrl(imagePath);
+    //     existingTemplate.setName(fileName.split("\\.")[0]);
+    // }
         
         
-        return new ResponseEntity<>(fraudTemplateService.updateFraudTemplate(existingTemplate), HttpStatus.OK);
-    }
+    //     return new ResponseEntity<>(fraudTemplateService.updateFraudTemplate(existingTemplate), HttpStatus.OK);
+    // }
     
     @DeleteMapping()
     public ResponseEntity<String> deleteMultipleFraudTemplate(@RequestBody List<Integer> listId )
@@ -171,8 +174,8 @@ public class FraudTemplateController {
 }
 
     @GetMapping("/by-label/{fraudLabelId}")
-    public ResponseEntity<List<FraudTemplateDTO>> getFraudTemplatesByLabel(@PathVariable int fraudLabelId) {
-    List<FraudTemplateDTO> fraudTemplatesDTO = fraudTemplateService.getFraudTemplatesByLabelId(fraudLabelId);
+    public ResponseEntity<List<FraudTemplate>> getFraudTemplatesByLabel(@PathVariable int fraudLabelId) {
+    List<FraudTemplate> fraudTemplatesDTO = fraudTemplateService.getFraudTemplatesByLabelId(fraudLabelId);
     
     if (fraudTemplatesDTO.isEmpty()) {
         return ResponseEntity.noContent().build();

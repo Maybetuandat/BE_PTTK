@@ -2,6 +2,8 @@ package com.example.demo.model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,6 +30,7 @@ public class FraudTemplate {
     
 
     private String name;
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "fraud_label_id", nullable = false)
     private FraudLabel fraudLabel;

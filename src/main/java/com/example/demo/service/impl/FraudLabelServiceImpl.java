@@ -1,13 +1,12 @@
 package com.example.demo.service.impl;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.dto.FraudLabelDTO;
-import com.example.demo.dto.mapper.FraudLabelMapper;
+
 import com.example.demo.model.FraudLabel;
 import com.example.demo.repository.FraudLabelRepository;
 import com.example.demo.service.FraudLabelService;
@@ -40,20 +39,17 @@ public class FraudLabelServiceImpl  implements FraudLabelService {
     }
 
     @Override
-    public FraudLabelDTO getFraudLabelDTO(int id) {
-        return FraudLabelMapper.mapToDTO(fraudLabelRepository.findById(id).orElse(null));
+    public FraudLabel getFraudLabelDTO(int id) {
+        return fraudLabelRepository.findById(id).orElse(null);
     }
 
     @Override
-    public List<FraudLabelDTO> getFraudLabelsDTO() {
+    public List<FraudLabel> getFraudLabelsDTO() {
         List<FraudLabel> listFraudLabels =  fraudLabelRepository.findAll();
 
 
-        List<FraudLabelDTO> listFraudLabelsDTO = new ArrayList<>();
-        for(FraudLabel fraudLabel : listFraudLabels) {
-            listFraudLabelsDTO.add(FraudLabelMapper.mapToDTO(fraudLabel));
-        }
-        return listFraudLabelsDTO;
+        
+        return listFraudLabels;
 
     }
 

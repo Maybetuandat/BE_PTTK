@@ -18,12 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.command.fraudlabel.CreateFraudLabelCommand;
-import com.example.demo.command.fraudlabel.DeleteFraudLabelCommand;
 
-import com.example.demo.command.fraudlabel.FraudLabelCommandInvoker;
-import com.example.demo.command.fraudlabel.UpdateFraudLabelCommand;
-import com.example.demo.dto.FraudLabelDTO;
 
 import com.example.demo.model.FraudLabel;
 import com.example.demo.service.FraudLabelService;
@@ -35,14 +30,14 @@ public class FraudLabelController {
     @Autowired
     FraudLabelService fraudLabelService;
 
-    private FraudLabelCommandInvoker invoker = new FraudLabelCommandInvoker();
+   
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<FraudLabelDTO> getFraudLabel(@PathVariable int id) {
+    public ResponseEntity<FraudLabel> getFraudLabel(@PathVariable int id) {
         
         System.out.println("id: " + id);
-        FraudLabelDTO fraudLabelDTO = fraudLabelService.getFraudLabelDTO(id);
+        FraudLabel fraudLabelDTO = fraudLabelService.getFraudLabelDTO(id);
         System.out.println("fraudLabel: " + fraudLabelDTO);
         if(fraudLabelDTO == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -51,7 +46,7 @@ public class FraudLabelController {
         
     }
     @GetMapping()
-    public ResponseEntity<List<FraudLabelDTO>> getAllFraudLabels() {
+    public ResponseEntity<List<FraudLabel>> getAllFraudLabels() {
         return new ResponseEntity<>(fraudLabelService.getFraudLabelsDTO(), HttpStatus.OK);
     }
 
@@ -61,10 +56,8 @@ public class FraudLabelController {
     public ResponseEntity<FraudLabel> createFraudLabel(@ModelAttribute  FraudLabel fraudLabel) {
 
         
-        CreateFraudLabelCommand createCommand = new CreateFraudLabelCommand(fraudLabelService, fraudLabel);
-        invoker.addCommand(createCommand); 
-        invoker.executeCommands();
-        return new ResponseEntity<>(fraudLabel, HttpStatus.CREATED);
+       FraudLabel saveFraudLabel = fraudLabelService.addFraudLabel(fraudLabel);
+        return new ResponseEntity<>(saveFraudLabel, HttpStatus.CREATED);
     }
 
    
@@ -72,19 +65,15 @@ public class FraudLabelController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFraudLabel(@PathVariable int id) {
         
-        DeleteFraudLabelCommand deleteCommand = new DeleteFraudLabelCommand(fraudLabelService, id);
-        invoker.addCommand(deleteCommand);
-        invoker.executeCommands();
+        fraudLabelService.deleteFraudLabel(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     @PutMapping("/{id}")
     public ResponseEntity<FraudLabel> updateFraudLabel(@PathVariable int id, @RequestBody FraudLabel fraudLabel) {
         fraudLabel.setId(id);
       
-        UpdateFraudLabelCommand updateFraudLabelCommand = new UpdateFraudLabelCommand(fraudLabelService, fraudLabel);
-        invoker.addCommand(updateFraudLabelCommand);
-        invoker.executeCommands();
+        FraudLabel updatedFraudLabel = fraudLabelService.updateFraudLabel(fraudLabel);
 
-        return new ResponseEntity<>(fraudLabel, HttpStatus.OK);
+        return new ResponseEntity<>(updatedFraudLabel, HttpStatus.OK);
     }
 }
