@@ -1,7 +1,11 @@
 package com.example.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,6 +23,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class BoundingBox {
     
     @Id
@@ -27,24 +32,35 @@ public class BoundingBox {
     
     
     // toa do cua bounding box trong yolo co the hieu duoc 
+    @JsonProperty("xCenter")
     private float xCenter; 
+    @JsonProperty("yCenter")
     private float yCenter; 
-    private float width;   
+    @JsonProperty("width")
+    private float width;  
+    @JsonProperty("height") 
     private float height;  
     
     //toa do pixel cua anh de co the hien thi len 
+    @JsonProperty("xPixel")
     private Integer xPixel;
+     @JsonProperty("yPixel")
     private Integer yPixel; 
+    @JsonProperty("widthPixel")
     private Integer widthPixel;
+    @JsonProperty("heightPixel")
     private Integer heightPixel;
     
     
-    @JsonBackReference
+    
+ 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "fraud_template_id", nullable = false)
     private FraudTemplate fraudTemplate;
     
-    @JsonBackReference
+    
+  
     @ManyToOne
     @JoinColumn(name = "fraud_label_id", nullable = false)
     private FraudLabel fraudLabel;

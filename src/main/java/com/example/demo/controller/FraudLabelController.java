@@ -53,7 +53,7 @@ public class FraudLabelController {
 
 
     @PostMapping()
-    public ResponseEntity<FraudLabel> createFraudLabel(@ModelAttribute  FraudLabel fraudLabel) {
+    public ResponseEntity<FraudLabel> createFraudLabel(@RequestBody  FraudLabel fraudLabel) {
 
         
        FraudLabel saveFraudLabel = fraudLabelService.addFraudLabel(fraudLabel);

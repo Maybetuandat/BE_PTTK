@@ -27,8 +27,9 @@ public class FraudLabelServiceImpl  implements FraudLabelService {
          if(fraudLabel.getName() != null) {
              newFraudLabel.setName(fraudLabel.getName());
          }
-         if(fraudLabel.getDescription() != null) {
-             newFraudLabel.setDescription(fraudLabel.getDescription());
+       
+         if(fraudLabel.getColor() != null) {
+             newFraudLabel.setColor(fraudLabel.getColor());
          }
          return fraudLabelRepository.save(newFraudLabel);
     }
