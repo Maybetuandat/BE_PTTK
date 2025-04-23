@@ -11,7 +11,7 @@ import com.example.demo.model.FraudTemplate;
 @Repository
 public interface FraudTemplateRepository  extends JpaRepository<FraudTemplate, Integer> {
 
-    List<FraudTemplate> findByFraudLabelId(int fraudLabelId);
+   
 
-    Integer countByFraudLabel(FraudLabel label);
+ 
 }

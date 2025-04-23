@@ -15,9 +15,9 @@ public interface FraudTemplateService {
 
   
     public void deleteFraudTemplate(int id);
-    public FraudTemplate getFraudTemplateDTOById(Integer id);
-    public List<FraudTemplate> getAllFraudTemplatesDTO();
-    public List<FraudTemplate> getFraudTemplatesByLabelId(int fraudLabelId);
+    public FraudTemplate getFraudTemplateById(Integer id);
+    public List<FraudTemplate> getAllFraudTemplates();
+   // public List<FraudTemplate> getFraudTemplatesByLabelId(int fraudLabelId);
     public FraudTemplate getFraudTemplateById(int id);
     public boolean existsById(int id);
     

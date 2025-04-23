@@ -50,19 +50,19 @@ public class FraudTemplateController {
     FileStorageService fileStorageService;
     @GetMapping()
     public ResponseEntity<List<FraudTemplate>> getAllFraudTemplates() {
-        return new ResponseEntity<>(fraudTemplateService.getAllFraudTemplatesDTO(), HttpStatus.OK);
+        return new ResponseEntity<>(fraudTemplateService.getAllFraudTemplates(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<FraudTemplate> getFraudTemplate(
         @PathVariable Integer id 
     ) {
-        return ResponseEntity.ok(fraudTemplateService.getFraudTemplateDTOById(id));
+        return ResponseEntity.ok(fraudTemplateService.getFraudTemplateById(id));
     }
 
     @PostMapping()
     public ResponseEntity<String> createTemplate(
-        @RequestParam("fraudLabelId") int fraudLabelId,
+        
         @RequestParam("file") MultipartFile[] files
     ) throws IOException {
 
@@ -70,19 +70,24 @@ public class FraudTemplateController {
 
 
        
-       FraudLabel fraudLabel = fraudLabelService.getFraudLabelById(fraudLabelId);
+      
        try {
         
                 for(String fileName : listSaveFileName)
                 {
                     FraudTemplate fraudTemplate = new FraudTemplate();
-                    fraudTemplate.setFraudLabel(fraudLabel);
-                    fraudTemplate.setImageUrl(fileName);
-                    String[] firstSplit = fileName.split("\\."); 
-                    String[] secondSplit = firstSplit[0].split("/"); 
-                    String lastPart = secondSplit[secondSplit.length - 1]; 
+                   
+                   
+                    String[] splitToGetHeightAndWidth = fileName.split("\\s+");
+                    fraudTemplate.setImageUrl(splitToGetHeightAndWidth[0]);
+                    String width = splitToGetHeightAndWidth[1];
+                    String height = splitToGetHeightAndWidth[2];
+                    String[] splitToRemoveDotFile = splitToGetHeightAndWidth[0].split("\\."); 
+                    String[] splitToRemoveUPLOAD_DIR = splitToRemoveDotFile[0].split("/"); 
+                    String lastPart = splitToRemoveUPLOAD_DIR[splitToRemoveUPLOAD_DIR.length - 1]; 
                     fraudTemplate.setName(lastPart);
-
+                    fraudTemplate.setHeight(Integer.parseInt(height));
+                    fraudTemplate.setWidth(Integer.parseInt(width));
                    fraudTemplateService.addFraudTemplate(fraudTemplate);
                 }
        } catch (Exception e) {
@@ -135,6 +140,8 @@ public class FraudTemplateController {
 
         
        Boolean kt =  fraudTemplateService.deleteFraudTemplates(listId);
+       System.out.println(listId);
+       System.out.println(kt);
         if(kt )
           return ResponseEntity.ok("Deleted successfully");
         else
@@ -173,16 +180,16 @@ public class FraudTemplateController {
     }
 }
 
-    @GetMapping("/by-label/{fraudLabelId}")
-    public ResponseEntity<List<FraudTemplate>> getFraudTemplatesByLabel(@PathVariable int fraudLabelId) {
-    List<FraudTemplate> fraudTemplatesDTO = fraudTemplateService.getFraudTemplatesByLabelId(fraudLabelId);
+//     @GetMapping("/by-label/{fraudLabelId}")
+//     public ResponseEntity<List<FraudTemplate>> getFraudTemplatesByLabel(@PathVariable int fraudLabelId) {
+//     List<FraudTemplate> fraudTemplatesDTO = fraudTemplateService.getFraudTemplatesByLabelId(fraudLabelId);
     
-    if (fraudTemplatesDTO.isEmpty()) {
-        return ResponseEntity.noContent().build();
-    }
+//     if (fraudTemplatesDTO.isEmpty()) {
+//         return ResponseEntity.noContent().build();
+//     }
     
-    return ResponseEntity.ok(fraudTemplatesDTO); 
-}
+//     return ResponseEntity.ok(fraudTemplatesDTO); 
+// }
 
 
 

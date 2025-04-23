@@ -9,7 +9,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
+
+import javax.imageio.ImageIO;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +29,7 @@ import com.example.demo.service.FileStorageService;
 public class FileStorageServiceImpl  implements FileStorageService{
 
     public static final  String UPLOAD_DIR = "images/";
-    public static final String BASE_URL = "http://192.168.49.2:30080/images/";
+    public static final String BASE_URL = "http://localhost:8080/images/";
     @Override
     public List<String> saveImage(MultipartFile[] files) throws IOException {
 
@@ -36,10 +40,35 @@ public class FileStorageServiceImpl  implements FileStorageService{
             Path filePath = Paths.get(UPLOAD_DIR + fileName);
             Files.createDirectories(filePath.getParent());
             Files.write(filePath, file.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-            listSaveFileName.add(BASE_URL + fileName);
+            BufferedImage image = ImageIO.read(filePath.toFile());
+            int width = image.getWidth();
+            int height = image.getHeight();
+
+
+            listSaveFileName.add(BASE_URL + fileName + " " + width + " " + height);
+            System.out.println("File saved: " + fileName);
+            System.out.println("Width: " + width);
+            System.out.println("Height: " + height);
         }
         return listSaveFileName;
           
+    }
+    @Override
+    public Boolean deleteImage(String imageUrl) throws IOException {
+         
+        String filePath = imageUrl.replace(BASE_URL, UPLOAD_DIR);
+        System.out.println(imageUrl);
+        System.out.println(filePath);
+        File file = new File(filePath);
+        if (file.exists()) {
+            if (file.delete()) {
+             return true;
+            } else {
+               return false;
+            }
+        } 
+        return false;
+        
     }
 
 

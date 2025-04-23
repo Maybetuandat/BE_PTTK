@@ -1,5 +1,8 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,28 +23,33 @@ public class BoundingBox {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
     
-    // Coordinates normalized from 0-1 (YOLO format)
-    private float xCenter; // Tọa độ x của tâm hộp, chuẩn hóa từ 0-1
-    private float yCenter; // Tọa độ y của tâm hộp, chuẩn hóa từ 0-1
-    private float width;   // Chiều rộng của hộp, chuẩn hóa từ 0-1
-    private float height;  // Chiều cao của hộp, chuẩn hóa từ 0-1
     
-    // Lưu tọa độ gốc (pixel) cho việc hiển thị
-    private int xPixel;
-    private int yPixel; 
-    private int widthPixel;
-    private int heightPixel;
+    // toa do cua bounding box trong yolo co the hieu duoc 
+    private float xCenter; 
+    private float yCenter; 
+    private float width;   
+    private float height;  
     
-    private float confidence;
+    //toa do pixel cua anh de co the hien thi len 
+    private Integer xPixel;
+    private Integer yPixel; 
+    private Integer widthPixel;
+    private Integer heightPixel;
     
+    
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "fraud_template_id", nullable = false)
     private FraudTemplate fraudTemplate;
     
-    // Chuyển đổi tọa độ pixel sang tọa độ chuẩn hóa (0-1) cho YOLO
-    public void normalizeCoordinates() {
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "fraud_label_id", nullable = false)
+    private FraudLabel fraudLabel;
+    
+    public void convertToYoloParameter() {
         int imgWidth = this.fraudTemplate.getWidth();
         int imgHeight = this.fraudTemplate.getHeight();
         
@@ -51,8 +59,8 @@ public class BoundingBox {
         this.height = (float)this.heightPixel / imgHeight;
     }
     
-    // Chuyển từ tọa độ chuẩn hóa sang pixel
-    public void denormalizeCoordinates() {
+    
+    public void convertToPixel() {
         int imgWidth = this.fraudTemplate.getWidth();
         int imgHeight = this.fraudTemplate.getHeight();
         

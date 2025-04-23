@@ -52,12 +52,12 @@ public class FraudTemplateServiceImpl  implements FraudTemplateService{
     }
 
     @Override
-    public FraudTemplate getFraudTemplateDTOById(Integer id) {
+    public FraudTemplate getFraudTemplateById(Integer id) {
         return fraudTemplateRepository.findById(id).get();
     }
 
     @Override
-    public List<FraudTemplate> getAllFraudTemplatesDTO() {
+    public List<FraudTemplate> getAllFraudTemplates() {
         List<FraudTemplate> listFraudTemplates =  fraudTemplateRepository.findAll();
 
 
@@ -66,15 +66,15 @@ public class FraudTemplateServiceImpl  implements FraudTemplateService{
         
     }
 
-    @Override
-    public List<FraudTemplate> getFraudTemplatesByLabelId(int fraudLabelId) {
-        // TODO Auto-generated method stub
+    // @Override
+    // public List<FraudTemplate> getFraudTemplatesByLabelId(int fraudLabelId) {
+    //     // TODO Auto-generated method stub
 
         
-            List<FraudTemplate> listFraudTemplates = fraudTemplateRepository.findByFraudLabelId(fraudLabelId);
+    //         List<FraudTemplate> listFraudTemplates = fraudTemplateRepository.findByFraudLabelId(fraudLabelId);
            
-            return listFraudTemplates;
-    }
+    //         return listFraudTemplates;
+    // }
 
     @Override
     public FraudTemplate getFraudTemplateById(int id) {
@@ -94,7 +94,10 @@ public class FraudTemplateServiceImpl  implements FraudTemplateService{
         try {
             for (Integer id : listId) {
                 FraudTemplate fraudTemplate = fraudTemplateRepository.findById(id).get();
-               // fileStorageService.deleteImage(fraudTemplate.getImageUrl());
+              
+                System.out.println(fraudTemplate);
+                Boolean check = fileStorageService.deleteImage(fraudTemplate.getImageUrl());
+                System.out.println(check);
                 fraudTemplateRepository.deleteById(id);
               
             }
@@ -115,7 +118,15 @@ public class FraudTemplateServiceImpl  implements FraudTemplateService{
 
     @Override
     public void addFraudTemplate(FraudTemplate fraudTemplate) {
-      fraudTemplateRepository.save(fraudTemplate);
+        try
+        {
+            fraudTemplateRepository.save(fraudTemplate);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.toString());
+        }
+      
     }
 
     
