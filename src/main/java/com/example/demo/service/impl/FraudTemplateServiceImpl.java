@@ -107,14 +107,15 @@ public class FraudTemplateServiceImpl  implements FraudTemplateService{
 
 
     @Override
-    public void addFraudTemplate(FraudTemplate fraudTemplate) {
+    public FraudTemplate addFraudTemplate(FraudTemplate fraudTemplate) {
         try
         {
-            fraudTemplateRepository.save(fraudTemplate);
+            return fraudTemplateRepository.save(fraudTemplate);
         }
         catch(Exception e)
         {
             System.out.println(e.toString());
+            return null;
         }
       
     }

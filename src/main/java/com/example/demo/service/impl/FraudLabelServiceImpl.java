@@ -40,12 +40,12 @@ public class FraudLabelServiceImpl  implements FraudLabelService {
     }
 
     @Override
-    public FraudLabel getFraudLabelDTO(int id) {
+    public FraudLabel getFraudLabel(int id) {
         return fraudLabelRepository.findById(id).orElse(null);
     }
 
     @Override
-    public List<FraudLabel> getFraudLabelsDTO() {
+    public List<FraudLabel> getFraudLabels() {
         List<FraudLabel> listFraudLabels =  fraudLabelRepository.findAll();
 
 
@@ -59,9 +59,6 @@ public class FraudLabelServiceImpl  implements FraudLabelService {
           return fraudLabelRepository.findById(id).orElse(null);
     }
 
-    @Override
-    public List<FraudLabel> getFraudLabels() {
-        return fraudLabelRepository.findAll();
-    }
+  
 
 }

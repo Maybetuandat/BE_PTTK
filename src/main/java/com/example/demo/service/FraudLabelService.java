@@ -14,8 +14,8 @@ public interface FraudLabelService {
     public FraudLabel addFraudLabel(FraudLabel fraudLabel);
     public FraudLabel updateFraudLabel(FraudLabel fraudLabel);
     public void deleteFraudLabel(int id);
-    public FraudLabel getFraudLabelDTO(int id);
-    public List<FraudLabel> getFraudLabelsDTO();
+    public FraudLabel getFraudLabel(int id);
+    
     public FraudLabel getFraudLabelById(int id);
     public List<FraudLabel> getFraudLabels();
 }

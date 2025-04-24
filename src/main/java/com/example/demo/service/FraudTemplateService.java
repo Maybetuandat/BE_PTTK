@@ -20,7 +20,7 @@ public interface FraudTemplateService {
   
     public boolean existsById(int id);
     
-    public void addFraudTemplate(FraudTemplate fraudTemplate);
+    public FraudTemplate addFraudTemplate(FraudTemplate fraudTemplate);
     @Transactional
     public Boolean deleteFraudTemplates(List<Integer> listId);
 }
