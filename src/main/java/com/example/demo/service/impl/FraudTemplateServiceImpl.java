@@ -19,21 +19,14 @@ import jakarta.transaction.Transactional;
 @Service
 public class FraudTemplateServiceImpl  implements FraudTemplateService{
 
+
+    
+    private final String UPLOAD_DIR = "images/";
     @Autowired
     private FraudTemplateRepository fraudTemplateRepository;
     @Autowired
     private FileStorageService fileStorageService;
   
-
-    
-    
-  
-
-    // @Override
-    // public FraudTemplate updateFraudTemplate(FraudTemplate fraudTemplate) {
-    //      return fraudTemplateRepository.save(fraudTemplate);
-    // }
-
 
     @Override
     public void deleteFraudTemplate(int id) {
@@ -51,34 +44,28 @@ public class FraudTemplateServiceImpl  implements FraudTemplateService{
         }
     }
 
-    @Override
-    public FraudTemplate getFraudTemplateById(Integer id) {
-        return fraudTemplateRepository.findById(id).get();
-    }
+
 
     @Override
     public List<FraudTemplate> getAllFraudTemplates() {
         List<FraudTemplate> listFraudTemplates =  fraudTemplateRepository.findAll();
 
+       
 
       
         return listFraudTemplates;
         
     }
 
-    // @Override
-    // public List<FraudTemplate> getFraudTemplatesByLabelId(int fraudLabelId) {
-    //     // TODO Auto-generated method stub
-
-        
-    //         List<FraudTemplate> listFraudTemplates = fraudTemplateRepository.findByFraudLabelId(fraudLabelId);
-           
-    //         return listFraudTemplates;
-    // }
+  
 
     @Override
-    public FraudTemplate getFraudTemplateById(int id) {
-          return fraudTemplateRepository.findById(id).get();
+    public FraudTemplate getFraudTemplateById(Integer id) {
+          FraudTemplate fraudTemplate = fraudTemplateRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("FraudTemplate not found"));
+        
+        return fraudTemplate;
+          
     }
 
     @Override
@@ -95,8 +82,11 @@ public class FraudTemplateServiceImpl  implements FraudTemplateService{
             for (Integer id : listId) {
                 FraudTemplate fraudTemplate = fraudTemplateRepository.findById(id).get();
               
-                System.out.println(fraudTemplate);
-                Boolean check = fileStorageService.deleteImage(fraudTemplate.getImageUrl());
+             //   System.out.println(fraudTemplate);
+                
+                String imageUrl = UPLOAD_DIR + fraudTemplate.getName();
+              //  System.out.println(imageUrl);
+                Boolean check = fileStorageService.deleteImage(imageUrl);
                 System.out.println(check);
                 fraudTemplateRepository.deleteById(id);
               

@@ -29,7 +29,8 @@ import com.example.demo.service.FileStorageService;
 public class FileStorageServiceImpl  implements FileStorageService{
 
     public static final  String UPLOAD_DIR = "images/";
-    public static final String BASE_URL = "http://localhost:8080/images/";
+   
+    private final String BASE_URL = "http://localhost:8888/images/";
     @Override
     public List<String> saveImage(MultipartFile[] files) throws IOException {
 
@@ -45,7 +46,9 @@ public class FileStorageServiceImpl  implements FileStorageService{
             int height = image.getHeight();
 
 
-            listSaveFileName.add(BASE_URL + fileName + " " + width + " " + height);
+            String imageUrl = BASE_URL + fileName;
+            System.out.println("Image URL: " + imageUrl);
+            listSaveFileName.add(imageUrl + " " + width + " " + height);
             System.out.println("File saved: " + fileName);
             System.out.println("Width: " + width);
             System.out.println("Height: " + height);
@@ -56,7 +59,7 @@ public class FileStorageServiceImpl  implements FileStorageService{
     @Override
     public Boolean deleteImage(String imageUrl) throws IOException {
          
-        String filePath = imageUrl.replace(BASE_URL, UPLOAD_DIR);
+        String filePath = imageUrl;
         System.out.println(imageUrl);
         System.out.println(filePath);
         File file = new File(filePath);

@@ -76,18 +76,21 @@ public class FraudTemplateController {
                 for(String fileName : listSaveFileName)
                 {
                     FraudTemplate fraudTemplate = new FraudTemplate();
-                   
-                   
                     String[] splitToGetHeightAndWidth = fileName.split("\\s+");
-                    fraudTemplate.setImageUrl(splitToGetHeightAndWidth[0]);
+                    String imageUrl = splitToGetHeightAndWidth[0];
+                    fraudTemplate.setImageUrl(imageUrl);
                     String width = splitToGetHeightAndWidth[1];
                     String height = splitToGetHeightAndWidth[2];
-                    String[] splitToRemoveDotFile = splitToGetHeightAndWidth[0].split("\\."); 
-                    String[] splitToRemoveUPLOAD_DIR = splitToRemoveDotFile[0].split("/"); 
-                    String lastPart = splitToRemoveUPLOAD_DIR[splitToRemoveUPLOAD_DIR.length - 1]; 
-                    fraudTemplate.setName(lastPart);
+                    // fraudTemplate.setName(splitToGetHeightAndWidth[0]);
                     fraudTemplate.setHeight(Integer.parseInt(height));
                     fraudTemplate.setWidth(Integer.parseInt(width));
+
+                      //http://localhost:8080/images/1681234567890_abc.jpg
+
+                    String fileNameWithoutUrl = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+                    System.out.println("File name without URL: " + fileNameWithoutUrl);
+                    fraudTemplate.setName(fileNameWithoutUrl);
+
                    fraudTemplateService.addFraudTemplate(fraudTemplate);
                 }
        } catch (Exception e) {
@@ -102,32 +105,6 @@ public class FraudTemplateController {
        
     }
 
-
-
-    // @PutMapping("/{id}")
-    // public ResponseEntity<FraudTemplate> updateFraudTemplate(
-    //     @PathVariable int id, 
-    //     @ModelAttribute FraudTemplate fraudTemplate,
-    //     @RequestParam(value = "image", required = false ) MultipartFile image
-    //      ) throws IOException {
-
-
-    //     FraudTemplate existingTemplate = fraudTemplateService.getFraudTemplateById(id);
-    //     if(existingTemplate == null) {
-    //         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    //     }
-    //    // System.out.println(existingTemplate.getFraudLabel());
-        
-    //    if (image != null && !image.isEmpty()) {
-    //     String fileName = image.getOriginalFilename();
-    //     String imagePath = fileStorageService.saveImage(image, fileName);  
-    //     existingTemplate.setImageUrl(imagePath);
-    //     existingTemplate.setName(fileName.split("\\.")[0]);
-    // }
-        
-        
-    //     return new ResponseEntity<>(fraudTemplateService.updateFraudTemplate(existingTemplate), HttpStatus.OK);
-    // }
     
     @DeleteMapping()
     public ResponseEntity<String> deleteMultipleFraudTemplate(@RequestBody List<Integer> listId )
