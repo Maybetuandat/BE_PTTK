@@ -120,6 +120,21 @@ public class FraudTemplateServiceImpl  implements FraudTemplateService{
       
     }
 
+
+
+    @Override
+    public FraudTemplate updateFraudTemplate(FraudTemplate fraudTemplate) {
+        try
+        {
+            return fraudTemplateRepository.save(fraudTemplate);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.toString());
+            return null;
+        }
+    }
+
     
 
    

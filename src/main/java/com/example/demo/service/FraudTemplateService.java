@@ -23,4 +23,5 @@ public interface FraudTemplateService {
     public FraudTemplate addFraudTemplate(FraudTemplate fraudTemplate);
     @Transactional
     public Boolean deleteFraudTemplates(List<Integer> listId);
+    public FraudTemplate updateFraudTemplate(FraudTemplate fraudTemplate);
 }
