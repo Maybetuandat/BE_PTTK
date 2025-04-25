@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -57,17 +58,7 @@ public class FraudLabelController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFraudLabel(@PathVariable int id) {
-        try {
-            DeleteFraudLabelCommand command = new DeleteFraudLabelCommand(fraudLabelService, id);
-            commandInvoker.executeCommand(command);
-          //  commandInvoker.undoLastCommand(); 
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+   
     
     @PutMapping("/{id}")
     public ResponseEntity<FraudLabel> updateFraudLabel(@PathVariable int id, @RequestBody FraudLabel fraudLabel) {
@@ -81,14 +72,40 @@ public class FraudLabelController {
         }
     }
     
-    // Optional: Endpoint để hoàn tác thao tác cuối cùng
-    @PostMapping("/undo")
-    public ResponseEntity<String> undoLastOperation() {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteFraudLabel(@PathVariable int id) {
         try {
-            commandInvoker.undoLastCommand();
-            return new ResponseEntity<>("Hoàn tác thành công", HttpStatus.OK);
+          
+            
+            DeleteFraudLabelCommand command = new DeleteFraudLabelCommand(fraudLabelService, id);
+            
+            
+            String commandId = commandInvoker.executeCommandWithTimeOut(command, 30000);
+            
+            
+            return ResponseEntity.ok().body(Map.of(
+                "message", "label deleted",
+                "commandId", commandId,
+                "undoTimeoutMs", 30000
+            ));
         } catch (Exception e) {
-            return new ResponseEntity<>("Lỗi khi hoàn tác: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Có lỗi xảy ra khi xóa nhãn: " + e.getMessage());
         }
     }
+
+
+        @PostMapping("/undo/{commandId}")
+        public ResponseEntity<?> undoCommand(@PathVariable String commandId) {
+            boolean undoSuccessful = commandInvoker.undoCommandWithTimeOut(commandId);
+            if (undoSuccessful) {
+                return ResponseEntity.ok().body(Map.of(
+                    "message", "Return "
+                ));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "message", "can't undo this command"
+                ));
+            }
+        }
 }
