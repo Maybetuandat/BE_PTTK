@@ -14,7 +14,7 @@ import com.example.demo.repository.FraudTemplateRepository;
 import com.example.demo.service.FileStorageService;
 import com.example.demo.service.FraudTemplateService;
 
-
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 @Service
 public class FraudTemplateServiceImpl  implements FraudTemplateService{
@@ -122,19 +122,19 @@ public class FraudTemplateServiceImpl  implements FraudTemplateService{
 
 
 
-    @Override
-    public FraudTemplate updateFraudTemplate(FraudTemplate fraudTemplate) {
-        try
-        {
+        @Override
+        @Transactional
+        public FraudTemplate updateFraudTemplate(FraudTemplate fraudTemplate) {
+            if (fraudTemplate == null || fraudTemplate.getId() == null) {
+                throw new IllegalArgumentException("FraudTemplate hoặc ID không được để trống");
+            }
+            
+            if (!existsById(fraudTemplate.getId())) {
+                throw new EntityNotFoundException("Không tìm thấy FraudTemplate với ID " + fraudTemplate.getId());
+            }
+            
             return fraudTemplateRepository.save(fraudTemplate);
         }
-        catch(Exception e)
-        {
-            System.out.println(e.toString());
-            return null;
-        }
-    }
-
     
 
    

@@ -21,17 +21,23 @@ import com.example.demo.command.CommandInvoker;
 import com.example.demo.command.fraudtemplate.CreateFraudTemplateCommand;
 import com.example.demo.command.fraudtemplate.DeleteFraudTemplateCommand;
 import com.example.demo.command.fraudtemplate.DeleteMultipleFraudTemplatesCommand;
+import com.example.demo.model.BoundingBox;
+import com.example.demo.model.FraudLabel;
 import com.example.demo.model.FraudTemplate;
+import com.example.demo.service.BoundingBoxService;
 import com.example.demo.service.FileStorageService;
 import com.example.demo.service.FraudLabelService;
 import com.example.demo.service.FraudTemplateService;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/api/fraud-template")
 public class FraudTemplateController {
 
+    @Autowired
+    BoundingBoxService boundingBoxService;
     @Autowired
     private FraudTemplateService fraudTemplateService;
 
@@ -116,4 +122,89 @@ public class FraudTemplateController {
             return new ResponseEntity<>("Lỗi khi hoàn tác: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+    @PostMapping("/{id}/bounding-box")
+    public ResponseEntity<?> addBoundingBoxToTemplate(
+            @PathVariable("id") Integer fraudTemplateId,
+            @RequestParam Integer xPixel,
+            @RequestParam Integer yPixel,
+            @RequestParam Integer widthPixel,
+            @RequestParam Integer heightPixel,
+            @RequestParam Integer fraudLabelId) {
+        
+        try {
+            if (!fraudTemplateService.existsById(fraudTemplateId)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Không tìm thấy template với ID: " + fraudTemplateId);
+            }
+            
+            
+            FraudTemplate fraudTemplate = fraudTemplateService.getFraudTemplateById(fraudTemplateId);
+            
+            
+            BoundingBox boundingBox = new BoundingBox();
+            boundingBox.setXPixel(xPixel);
+            boundingBox.setYPixel(yPixel);
+            boundingBox.setWidthPixel(widthPixel);
+            boundingBox.setHeightPixel(heightPixel);
+            boundingBox.setFraudTemplate(fraudTemplate);
+            
+            try {
+                FraudLabel fraudLabel = fraudLabelService.getFraudLabelById(fraudLabelId);
+                boundingBox.setFraudLabel(fraudLabel);
+            } catch (EntityNotFoundException e) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Không tìm thấy label với ID: " + fraudLabelId);
+            }
+            
+            
+            if (boundingBox.getXPixel() != null && boundingBox.getYPixel() != null 
+                    && boundingBox.getWidthPixel() != null && boundingBox.getHeightPixel() != null) {
+                boundingBox.convertToYoloParameter();
+            } 
+            else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Phải cung cấp tọa độ hợp lệ");
+            }
+            
+            
+            BoundingBox savedBoundingBox = boundingBoxService.addBoundingBox(boundingBox);
+            
+            return ResponseEntity.status(HttpStatus.OK).body(savedBoundingBox);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Lỗi khi thêm bounding box: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{templateId}/bounding-box/{boxId}")
+    public ResponseEntity<?> deleteBoundingBoxFromTemplate(
+            @PathVariable("templateId") Integer templateId,
+            @PathVariable("boxId") Integer boxId) {
+        
+        try {
+            
+            if (!fraudTemplateService.existsById(templateId)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Không tìm thấy template với ID: " + templateId);
+            }
+            
+            
+            boolean deleted = boundingBoxService.deleteBoundingBoxFromTemplate(templateId, boxId);
+            
+            if (deleted) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Không tìm thấy bounding box với ID: " + boxId);
+            }
+        } catch (Exception e) {
+            System.err.println("Error deleting bounding box: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Lỗi khi xóa bounding box: " + e.getMessage());
+        }
+    }
 }
+               

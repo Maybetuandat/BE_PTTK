@@ -43,7 +43,7 @@ public class FraudTemplate {
     private String name;
 
   
-    @OneToMany(mappedBy = "fraudTemplate", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "fraudTemplate", cascade = CascadeType.ALL,  orphanRemoval = true)
     private List<BoundingBox> boundingBoxes;
   
     private String imageUrl;

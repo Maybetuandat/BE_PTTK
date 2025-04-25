@@ -1,57 +1,65 @@
 package com.example.demo.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.model.BoundingBox;
 import com.example.demo.repository.BoundingBoxRepository;
 import com.example.demo.service.BoundingBoxService;
 
 @Service
-public class BoundingBoxServiceImpl  implements BoundingBoxService{
-
-
+public class BoundingBoxServiceImpl implements BoundingBoxService {
 
     @Autowired
     BoundingBoxRepository boundingBoxRepository;
+    
     @Override
     public List<BoundingBox> getBoundingBoxsWithFraudTemplateId(Integer fraudTemplateId) {
         List<BoundingBox> boundingBoxList = null;
-          try
-          {
+        try {
             boundingBoxList = boundingBoxRepository.findByFraudTemplateId(fraudTemplateId);
-          }
-          catch (Exception e) {
-              System.out.println(e);
-          }
-          return boundingBoxList;
+        } catch (Exception e) {
+            System.out.println("Error getting bounding boxes: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return boundingBoxList;
     }
 
     @Override
     public BoundingBox addBoundingBox(BoundingBox boundingBox) {
-        BoundingBox saveBoundingBox = new BoundingBox();
-        try{
-
-             saveBoundingBox = boundingBoxRepository.save(boundingBox);
+        BoundingBox saveBoundingBox = null;
+        try {
+            saveBoundingBox = boundingBoxRepository.save(boundingBox);
+        } catch (Exception e) {
+            System.out.println("Error saving bounding box: " + e.getMessage());
+            e.printStackTrace();
         }
-        catch (Exception e) {
-            System.out.println(e);
-        }
-       return saveBoundingBox;
+        return saveBoundingBox;
     }
-
     @Override
-    public void deleteBoundingBox(Integer boundingBoxId) {
-         try
-         {
-            boundingBoxRepository.deleteById(boundingBoxId);
-         }
-         catch (Exception e) {
-             System.out.println(e);
-         }
-         
+    @Transactional
+    public boolean deleteBoundingBoxFromTemplate(Integer templateId, Integer boxId) {
+        try {
+            Optional<BoundingBox> boxOpt = boundingBoxRepository.findById(boxId);
+            
+            if (boxOpt.isEmpty()) {
+                return false;
+            }
+            
+            BoundingBox box = boxOpt.get();
+            if (box.getFraudTemplate().getId().equals(templateId)) {
+                boundingBoxRepository.delete(box);
+                return true;
+            }
+            
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
-
 }

@@ -11,5 +11,6 @@ public interface BoundingBoxService {
 
     List<BoundingBox> getBoundingBoxsWithFraudTemplateId(Integer fraudTemplateId);
     BoundingBox addBoundingBox(BoundingBox boundingBox);
-    void deleteBoundingBox(Integer boundingBoxId);
+    
+    public boolean deleteBoundingBoxFromTemplate(Integer templateId, Integer boxId);
 }
