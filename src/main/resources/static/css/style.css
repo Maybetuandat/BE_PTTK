@@ -1,0 +1,98 @@
+/* Đặt kích thước cố định cho sidebar */
+.sidebar {
+    width: 300px;
+    background-color: #f8f9fa;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+}
+
+/* Danh mục */
+.category-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.category-list li {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.category-list li:hover {
+    background-color: #f1f1f1;
+
+}
+
+
+.sidebar {
+    width: 280px;
+    /* Cố định chiều rộng sidebar */
+    background-color: #f8f9fa;
+    overflow-y: auto;
+}
+
+
+
+.category-list li img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.category-list li span {
+    font-size: 16px;
+    color: #555;
+}
+
+/* Slider */
+.slider-container {
+    flex-grow: 1;
+
+    /* Chiều cao toàn màn hình */
+
+    background-color: #fff;
+    display: flex;
+
+    justify-content: flex-start;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-left: 50px;
+    margin-top: 50px;
+}
+
+.slider-container img {
+    max-width: 100%;
+    /* Đảm bảo ảnh không vượt quá chiều rộng của container */
+    height: auto;
+    /* Đảm bảo tỷ lệ ảnh không bị thay đổi */
+    max-height: 80%;
+    /* Giới hạn chiều cao ảnh để ảnh không bị quá lớn */
+}
+
+.carousel {
+    width: 100%;
+    /* Đảm bảo slider chiếm toàn bộ chiều rộng phần còn lại */
+    max-width: 1200px;
+    /* Giới hạn chiều rộng tối đa */
+    height: 600px;
+    /* Chiều cao cố định */
+}
+
+.carousel-inner {
+    width: 100%;
+    height: 100%;
+}
+
+.carousel-inner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Đảm bảo ảnh không bị méo */
+    border-radius: 10px;
+    /* Bo góc cho ảnh */
+}

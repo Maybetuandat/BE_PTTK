@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fraud-microservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fraud-microservice
+  template:
+    metadata:
+      labels:
+        app: fraud-microservice
+    spec:
+      containers:
+        - name: fraud-service
+          image: fraud_service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
