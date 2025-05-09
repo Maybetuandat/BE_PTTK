@@ -57,7 +57,7 @@ public class DeleteBoundingBoxCommand implements Command {
             return;
         }
         
-        
+        deletedBoundingBox.setId(null);
         boundingBoxService.addBoundingBox(deletedBoundingBox);
     }
 }

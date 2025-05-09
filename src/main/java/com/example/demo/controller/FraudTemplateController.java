@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -176,9 +177,14 @@ public class FraudTemplateController {
                 boxId
             );
             
-            commandInvoker.executeCommand(command);
+            String commandId = commandInvoker.executeCommandWithTimeOut(command,30000 );
+
+            return ResponseEntity.ok().body(Map.of(
+                "message", "Bounding box deleted",
+                "commandId", commandId,
+                "undoTimeoutMs", 30000
+            ));
             
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
@@ -189,5 +195,18 @@ public class FraudTemplateController {
         }
     }
     
+    @PostMapping("/undo/{commandId}")
+    public ResponseEntity<?> undoCommand(@PathVariable String commandId) {
+        boolean undoSuccessful = commandInvoker.undoCommandWithTimeOut(commandId);
+        if (undoSuccessful) {
+            return ResponseEntity.ok().body(Map.of(
+                "message", "Return "
+            ));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                "message", "can't undo this command"
+            ));
+        }
+    }
 }
                
