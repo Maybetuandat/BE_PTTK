@@ -122,15 +122,6 @@ public class FraudTemplateController {
     }
     
     // Optional: Endpoint để hoàn tác thao tác cuối cùng
-    @PostMapping("/undo")
-    public ResponseEntity<String> undoLastOperation() {
-        try {
-            commandInvoker.undoLastCommand();
-            return new ResponseEntity<>("Hoàn tác thành công", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Lỗi khi hoàn tác: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
 
    @PostMapping("/{id}/bounding-box")
@@ -197,5 +188,6 @@ public class FraudTemplateController {
                 .body("Lỗi khi xóa bounding box: " + e.getMessage());
         }
     }
+    
 }
                

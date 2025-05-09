@@ -82,21 +82,19 @@ public class BoundingBox {
         this.xPixel = (int)(this.xCenter * imgWidth - this.widthPixel/2.0);
         this.yPixel = (int)(this.yCenter * imgHeight - this.heightPixel/2.0);
     }
-    @Override
-    public String toString()
-    {
-        return "BoundingBox{" +
-                "id=" + id +
-                ", xCenter=" + xCenter +
-                ", yCenter=" + yCenter +
-                ", width=" + width +
-                ", height=" + height +
-                ", xPixel=" + xPixel +
-                ", yPixel=" + yPixel +
-                ", widthPixel=" + widthPixel +
-                ", heightPixel=" + heightPixel +
-                ", fraudTemplate=" + fraudTemplate.getId() +
-                ", fraudLabel=" + fraudLabel.getId() +
-                '}';
-    }
+    // @Override
+    // public String toString()
+    // {
+    //     return "BoundingBox{" +
+    //             "id=" + id +
+    //             ", xCenter=" + xCenter +
+    //             ", yCenter=" + yCenter +
+    //             ", width=" + width +
+    //             ", height=" + height +
+    //             ", xPixel=" + xPixel +
+    //             ", yPixel=" + yPixel +
+    //             ", widthPixel=" + widthPixel +
+    //             ", heightPixel=" + heightPixel +
+    //             '}';
+    // }
 }

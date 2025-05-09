@@ -32,7 +32,7 @@ public class DeleteFraudLabelCommand implements Command {
 
         if (deletedFraudLabel != null) {
             System.out.println("Undoing delete of FraudLabel: " + deletedFraudLabel);
-           
+           deletedFraudLabel.setId(null);
             fraudLabelService.addFraudLabel(deletedFraudLabel);
         }
         System.out.println("Undoing delete of FraudLabel: " + deletedFraudLabel);
