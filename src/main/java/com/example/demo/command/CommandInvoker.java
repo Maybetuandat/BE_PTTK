@@ -64,6 +64,7 @@ public class CommandInvoker {
                 commandHistory.remove(command);
             }
             System.out.println("Undoing command with ID: " + commandId);
+            
             return true;
         } else {
             System.out.println("No command found with ID: " + commandId);

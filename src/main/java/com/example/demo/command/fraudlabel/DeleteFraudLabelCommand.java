@@ -1,9 +1,14 @@
 package com.example.demo.command.fraudlabel;
 
+
+
 import com.example.demo.command.Command;
 import com.example.demo.model.FraudLabel;
 import com.example.demo.service.FraudLabelService;
 
+import lombok.extern.java.Log;
+
+import org.slf4j.Logger;
 public class DeleteFraudLabelCommand implements Command {
     private FraudLabelService fraudLabelService;
     private int fraudLabelId;
@@ -26,8 +31,10 @@ public class DeleteFraudLabelCommand implements Command {
     public void undo() {
 
         if (deletedFraudLabel != null) {
-            deletedFraudLabel.setId(null); 
+            System.out.println("Undoing delete of FraudLabel: " + deletedFraudLabel);
+           
             fraudLabelService.addFraudLabel(deletedFraudLabel);
         }
+        System.out.println("Undoing delete of FraudLabel: " + deletedFraudLabel);
     }
 }

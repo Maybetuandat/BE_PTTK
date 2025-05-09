@@ -18,6 +18,7 @@ public class FraudLabelServiceImpl  implements FraudLabelService {
     private FraudLabelRepository fraudLabelRepository;
     @Override
     public FraudLabel addFraudLabel(FraudLabel fraudLabel) {
+        System.out.println(fraudLabel);
         return fraudLabelRepository.save(fraudLabel);
     }
 

@@ -11,6 +11,8 @@ import com.example.demo.model.BoundingBox;
 import com.example.demo.repository.BoundingBoxRepository;
 import com.example.demo.service.BoundingBoxService;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class BoundingBoxServiceImpl implements BoundingBoxService {
 
@@ -61,5 +63,11 @@ public class BoundingBoxServiceImpl implements BoundingBoxService {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    @Override
+     public BoundingBox getBoundingBoxById(Integer id) {
+        return boundingBoxRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy bounding box với ID: " + id));
     }
 }

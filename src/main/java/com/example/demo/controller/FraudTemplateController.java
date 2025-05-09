@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.command.CommandInvoker;
+import com.example.demo.command.boundingbox.AddBoundingBoxCommand;
+import com.example.demo.command.boundingbox.DeleteBoundingBoxCommand;
 import com.example.demo.command.fraudtemplate.CreateFraudTemplateCommand;
 import com.example.demo.command.fraudtemplate.DeleteFraudTemplateCommand;
 import com.example.demo.command.fraudtemplate.DeleteMultipleFraudTemplatesCommand;
@@ -56,7 +58,14 @@ public class FraudTemplateController {
 
     @GetMapping("/{id}")
     public ResponseEntity<FraudTemplate> getFraudTemplate(@PathVariable Integer id) {
-        return ResponseEntity.ok(fraudTemplateService.getFraudTemplateById(id));
+        System.out.println(">> Controller called with id = " + id);
+        FraudTemplate fraudTemplate = fraudTemplateService.getFraudTemplateById(id);
+        if (fraudTemplate == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(null);
+        }
+        System.out.println("FraudTemplate: " + fraudTemplate);
+        return ResponseEntity.ok(fraudTemplate);
     }
 
     @PostMapping()
@@ -124,7 +133,7 @@ public class FraudTemplateController {
     }
 
 
-    @PostMapping("/{id}/bounding-box")
+   @PostMapping("/{id}/bounding-box")
     public ResponseEntity<?> addBoundingBoxToTemplate(
             @PathVariable("id") Integer fraudTemplateId,
             @RequestParam Integer xPixel,
@@ -134,71 +143,53 @@ public class FraudTemplateController {
             @RequestParam Integer fraudLabelId) {
         
         try {
-            if (!fraudTemplateService.existsById(fraudTemplateId)) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Không tìm thấy template với ID: " + fraudTemplateId);
-            }
+            
+            AddBoundingBoxCommand command = new AddBoundingBoxCommand(
+                boundingBoxService,
+                fraudTemplateService,
+                fraudLabelService,
+                fraudTemplateId,
+                xPixel,
+                yPixel,
+                widthPixel,
+                heightPixel,
+                fraudLabelId
+            );
+            
+            commandInvoker.executeCommand(command);
             
             
-            FraudTemplate fraudTemplate = fraudTemplateService.getFraudTemplateById(fraudTemplateId);
-            
-            
-            BoundingBox boundingBox = new BoundingBox();
-            boundingBox.setXPixel(xPixel);
-            boundingBox.setYPixel(yPixel);
-            boundingBox.setWidthPixel(widthPixel);
-            boundingBox.setHeightPixel(heightPixel);
-            boundingBox.setFraudTemplate(fraudTemplate);
-            
-            try {
-                FraudLabel fraudLabel = fraudLabelService.getFraudLabelById(fraudLabelId);
-                boundingBox.setFraudLabel(fraudLabel);
-            } catch (EntityNotFoundException e) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Không tìm thấy label với ID: " + fraudLabelId);
-            }
-            
-            
-            if (boundingBox.getXPixel() != null && boundingBox.getYPixel() != null 
-                    && boundingBox.getWidthPixel() != null && boundingBox.getHeightPixel() != null) {
-                boundingBox.convertToYoloParameter();
-            } 
-            else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Phải cung cấp tọa độ hợp lệ");
-            }
-            
-            
-            BoundingBox savedBoundingBox = boundingBoxService.addBoundingBox(boundingBox);
+            BoundingBox savedBoundingBox = command.getSavedBoundingBox();
             
             return ResponseEntity.status(HttpStatus.OK).body(savedBoundingBox);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Lỗi khi thêm bounding box: " + e.getMessage());
         }
     }
-
-    @DeleteMapping("/{templateId}/bounding-box/{boxId}")
+  @DeleteMapping("/{templateId}/bounding-box/{boxId}")
     public ResponseEntity<?> deleteBoundingBoxFromTemplate(
             @PathVariable("templateId") Integer templateId,
             @PathVariable("boxId") Integer boxId) {
         
         try {
             
-            if (!fraudTemplateService.existsById(templateId)) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Không tìm thấy template với ID: " + templateId);
-            }
+            DeleteBoundingBoxCommand command = new DeleteBoundingBoxCommand(
+                boundingBoxService,
+                fraudTemplateService,
+                templateId,
+                boxId
+            );
             
+            commandInvoker.executeCommand(command);
             
-            boolean deleted = boundingBoxService.deleteBoundingBoxFromTemplate(templateId, boxId);
-            
-            if (deleted) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Không tìm thấy bounding box với ID: " + boxId);
-            }
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             System.err.println("Error deleting bounding box: " + e.getMessage());
             e.printStackTrace();

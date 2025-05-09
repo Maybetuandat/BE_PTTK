@@ -13,4 +13,5 @@ public interface BoundingBoxService {
     BoundingBox addBoundingBox(BoundingBox boundingBox);
     
     public boolean deleteBoundingBoxFromTemplate(Integer templateId, Integer boxId);
+    public BoundingBox getBoundingBoxById(Integer id) ;
 }
