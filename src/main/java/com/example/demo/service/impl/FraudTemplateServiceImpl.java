@@ -1,7 +1,12 @@
 package com.example.demo.service.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +27,8 @@ public class FraudTemplateServiceImpl  implements FraudTemplateService{
 
     
     private final String UPLOAD_DIR = "images/";
+    
+    
     @Autowired
     private FraudTemplateRepository fraudTemplateRepository;
     @Autowired
@@ -78,6 +85,7 @@ public class FraudTemplateServiceImpl  implements FraudTemplateService{
     public Boolean deleteFraudTemplates(List<Integer> listId) {
         
 
+        
         try {
             for (Integer id : listId) {
                 FraudTemplate fraudTemplate = fraudTemplateRepository.findById(id).get();
@@ -85,12 +93,16 @@ public class FraudTemplateServiceImpl  implements FraudTemplateService{
              //   System.out.println(fraudTemplate);
                 
                 String imageUrl = UPLOAD_DIR + fraudTemplate.getName();
-              //  System.out.println(imageUrl);
+                
+               System.out.println(imageUrl);
                 Boolean check = fileStorageService.deleteImage(imageUrl);
                 System.out.println(check);
                 fraudTemplateRepository.deleteById(id);
+                
               
             }
+
+
         } catch (Exception e) {
             // TODO: handle exception
                 return false;

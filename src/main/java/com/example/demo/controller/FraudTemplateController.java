@@ -83,7 +83,7 @@ public class FraudTemplateController {
     }
 
     @DeleteMapping()
-    public ResponseEntity<String> deleteMultipleFraudTemplate(@RequestBody List<Integer> listId) {
+    public ResponseEntity<?> deleteMultipleFraudTemplate(@RequestBody List<Integer> listId) {
         try {
             if (listId == null || listId.isEmpty()) {
                 return ResponseEntity.badRequest().body("Danh sách ID không được để trống");
@@ -91,8 +91,12 @@ public class FraudTemplateController {
 
             DeleteMultipleFraudTemplatesCommand command = new DeleteMultipleFraudTemplatesCommand(
                 fraudTemplateService, listId);
-            commandInvoker.executeCommand(command);
-            return ResponseEntity.ok("Deleted successfully");
+            String commandId = commandInvoker.executeCommandWithTimeOut(command, 30000);
+            return ResponseEntity.ok().body(Map.of(
+                "message", "delete multiple templates",
+                "commandId", commandId,
+                "undoTimeoutMs", 30000
+            ));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Lỗi ràng buộc dữ liệu: " + e.getMessage());
         } catch (EntityNotFoundException e) {
